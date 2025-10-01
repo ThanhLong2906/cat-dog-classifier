@@ -1,0 +1,31 @@
+name: Deploy to Hugging Face Spaces
+
+on: 
+    push:
+        paths:
+            - "models/cat_dog.pth"
+jobs:
+    deploy:
+        runs-on: ubuntu-lastest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            
+            - name: Intall dependencies
+              run: pip install huggingface_hub
+
+            - name: Upload model to Hugging face
+              env:
+                HF_TOKEN: ${{ secrets.HF_TOKEN }}
+              run: |
+                python - <<'EOF'
+                from huggingface_hub import HfApi
+                api= HfApi()
+                api.upload_file(
+                    path_or_fileobj="models/cat_dog.pth",
+                    path_in_repo="models/cat_dog.pth",
+                    repo_id="longnguyen296/cat-dog-classifier",
+                    repo_type="space",
+                    token=${{ secrets.HF_TOKEN }}
+                    )
+                    EOF
