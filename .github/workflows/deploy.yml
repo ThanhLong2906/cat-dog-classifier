@@ -6,7 +6,7 @@ on:
             - "models/cat_dog.pth"
 jobs:
     deploy:
-        runs-on: ubuntu-lastest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
