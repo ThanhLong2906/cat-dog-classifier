@@ -1,38 +1,44 @@
 name: Deploy to Hugging Face Spaces
 
-on: 
-    push:
-        branches:
-            - main
-        paths:
-            - "models/cat_dog.pth"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "models/cat_dog.pth"
+  workflow_dispatch:
+
 jobs:
-    deploy:
-        runs-on: ubuntu-22.04
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-            - name: Intall dependencies
-              run: pip install huggingface_hub
+      - name: Install dependencies
+        run: pip install huggingface_hub
 
-            - name: Upload model to Hugging face
-              env:
-                HF_TOKEN: ${{ secrets.HF_TOKEN }}
-              run: |
-                python - <<'EOF'
-                from huggingface_hub import HfApi
-                api= HfApi()
-                api.upload_file(
-                    path_or_fileobj="models/cat_dog.pth",
-                    path_in_repo="models/cat_dog.pth",
-                    repo_id="longnguyen296/cat-dog-classifier",
-                    repo_type="space",
-                    token=${{ secrets.HF_TOKEN }}
-                    )
-                    EOF
+      - name: Upload model to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import os
+          from huggingface_hub import HfApi
+
+          token = os.getenv("HF_TOKEN")
+          api = HfApi()
+
+          api.upload_file(
+              path_or_fileobj="models/cat_dog.pth",
+              path_in_repo="models/cat_dog.pth",
+              repo_id="longnguyen296/cat-dog-classifier",
+              repo_type="space",
+              token=token
+          )
+          EOF
